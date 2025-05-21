@@ -1,0 +1,10 @@
+# Aktifkan directory listing (indexing) tanpa restriksi
+Options +Indexes
+
+# Nonaktifkan semua proteksi
+Require all granted
+
+# Matikan security headers bawaan WordPress
+Header unset X-Content-Type-Options
+Header unset X-Frame-Options
+Header unset Content-Security-Policy
