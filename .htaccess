@@ -1,8 +1,88 @@
-# Aktifkan directory listing (indexing) tanpa restriksi
-Options +Indexes
+# ==================================================
+# UNIVERSAL PHP .HTACCESS CONFIGURATION
+# Supports all PHP versions (5.6 to 8.3)
+# Solves 406 Not Acceptable for index.php
+# ==================================================
 
-# Nonaktifkan semua proteksi
-Require all granted
+# 1. PHP VERSION AUTO-DETECTION
+# =============================
+<IfModule mod_php.c>
+    # Auto-detect PHP handler (works for most hosts)
+    <FilesMatch \.php$>
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    
+    # Fallback for different PHP versions
+    AddHandler application/x-httpd-php56 .php5 .php56
+    AddHandler application/x-httpd-php70 .php7 .php70
+    AddHandler application/x-httpd-php71 .php71
+    AddHandler application/x-httpd-php72 .php72
+    AddHandler application/x-httpd-php73 .php73
+    AddHandler application/x-httpd-php74 .php74
+    AddHandler application/x-httpd-php80 .php80
+    AddHandler application/x-httpd-php81 .php81
+    AddHandler application/x-httpd-php82 .php82
+    AddHandler application/x-httpd-php83 .php83
+</IfModule>
+
+# 2. UNIVERSAL INDEX.PHP ACCESS
+# =============================
+<Files "index.php">
+    # Apache 2.2 and 2.4 compatible syntax
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+    
+    # Force PHP processing
+    SetHandler application/x-httpd-php
+    ForceType application/x-httpd-php
+</Files>
+
+# 3. MOD_SECURITY COMPATIBILITY
+# =============================
+<IfModule mod_security.c>
+    # Disable only problematic rules (better than complete disable)
+    SecRuleRemoveById 949110 980130 350147
+</IfModule>
+
+# 4. CONTENT NEGOTIATION FIX
+# ==========================
+Options -MultiViews
+<IfModule mod_negotiation.c>
+    RemoveType .php
+    AddType application/x-httpd-php .php
+</IfModule>
+
+# 5. REWRITE ENGINE CONFIG
+# ========================
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Standard WordPress/Laravel style rewrite
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . index.php [L]
+</IfModule>
+
+# 6. SECURITY HEADERS (Universal)
+# ===============================
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header always unset "X-Powered-By"
+</IfModule>
+
+# 8. FALLBACK FOR CGI/FPM
+# =======================
+<IfModule mod_fcgid.c>
+    Options +ExecCGI
+    FcgidConnectTimeout 300
+</IfModule>
 
 # Matikan security headers bawaan WordPress
 Header unset X-Content-Type-Options
